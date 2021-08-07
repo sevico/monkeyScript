@@ -66,7 +66,7 @@ func (l *Lexer) NextToken() token.Token {
 			ch:=l.ch
 			l.readChar()
 			literal:=string(ch)+string(l.ch)
-			tok=token.Token{Type: token.EQ,Literal: literal}
+			tok=token.Token{Type: token.NOT_EQ,Literal: literal}
 		}else{
 			tok=newToken(token.BANG,l.ch)
 		}
@@ -83,6 +83,16 @@ func (l *Lexer) NextToken() token.Token {
 		tok=newToken(token.LBRACE,l.ch)
 	case '}':
 		tok=newToken(token.RBRACE,l.ch)
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch)
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch)
+	case ':':
+		tok = newToken(token.COLON, l.ch)
+
 	case 0:
 		tok.Literal=""
 		tok.Type = token.EOF
@@ -102,6 +112,17 @@ func (l *Lexer) NextToken() token.Token {
 	}
 	l.readChar()
 	return tok
+}
+
+func (l *Lexer) readString() string {
+	position:= l.position+1
+	for  {
+		l.readChar()
+		if l.ch=='"'||l.ch==0{
+			break
+		}
+	}
+	return l.input[position:l.position]
 }
 
 func (l *Lexer) skipWhitespace(){
